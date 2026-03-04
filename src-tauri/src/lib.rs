@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+﻿use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use tauri::{
@@ -25,7 +25,11 @@ fn detect_chapters(content: &str) -> Vec<ChapterInfo> {
     let mut chapters: Vec<ChapterInfo> = Vec::new();
     let mut seen_titles: std::collections::HashSet<String> = std::collections::HashSet::new();
 
-    let re = regex::Regex::new(r"(?m)^(第[一二三四五六七八九十百千零〇0-9]+[章节卷部篇]|Chapter\s+\d+|CHAPTER\s+\d+)\s*(.*)$").unwrap();
+    // Match Chinese chapter headings and common English chapter titles.
+    let re = regex::Regex::new(
+        r"(?m)^\s*((?:第\s*[0-9一二三四五六七八九十百千万零两〇]+\s*[章节卷部篇回集])|(?:序章|楔子|后记|番外|尾声|引子)|(?:Chapter\s+\d+)|(?:CHAPTER\s+\d+))\s*(.*)$",
+    )
+    .unwrap();
 
     for cap in re.captures_iter(content) {
         if let (Some(chapter_num), Some(chapter_name)) = (cap.get(1), cap.get(2)) {
@@ -163,9 +167,9 @@ fn close_window(app: AppHandle) {
 fn set_window_opacity(_app: AppHandle, _opacity: f64) {}
 
 fn setup_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
-    let show_i = MenuItem::with_id(app, "show", "显示", true, None::<&str>)?;
-    let hide_i = MenuItem::with_id(app, "hide", "隐藏", true, None::<&str>)?;
-    let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
+    let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
+    let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None::<&str>)?;
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
     let menu = Menu::with_items(app, &[&show_i, &hide_i, &quit_i])?;
 
@@ -179,7 +183,7 @@ fn setup_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::
     let _tray = TrayIconBuilder::new()
         .icon(icon)
         .menu(&menu)
-        .tooltip("NovelReader - 小说阅读器")
+        .tooltip("NovelReader")
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => {
                 if let Some(window) = app.get_webview_window("main") {
@@ -215,6 +219,7 @@ fn setup_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::
 
     Ok(())
 }
+
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

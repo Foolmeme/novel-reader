@@ -192,7 +192,7 @@ function detectChaptersFromText(content: string): ChapterInfo[] {
 
   // Use unicode escapes to avoid source-encoding issues when matching Chinese headings.
   const chapterHeadingPattern =
-    /^(?:\u7b2c\s*[\d\u4e00-\u9fa5\u3007\u96f6\u4e24]+\s*[\u7ae0\u8282\u5377\u90e8\u7bc7\u56de\u96c6]|(?:\u5e8f\u7ae0|\u6954\u5b50|\u540e\u8bb0|\u756a\u5916|\u5c3e\u58f0|\u5f15\u5b50))(?:\s+|[:：\-_.、]).*$/u;
+    /^(?:\u7b2c\s*[\d\u4e00-\u9fa5\u3007\u96f6\u4e24]+\s*[\u7ae0\u8282\u5377\u90e8\u7bc7\u56de\u96c6]|(?:\u5e8f\u7ae0|\u6954\u5b50|\u540e\u8bb0|\u756a\u5916|\u5c3e\u58f0|\u5f15\u5b50))(?:\s+|[:\uFF1A\-_.\u3001]).*$/u;
 
   for (const rawLine of lines) {
     const trimmed = rawLine.trim();
@@ -1065,7 +1065,7 @@ function initUI(): void {
 async function setupGlobalShortcut(): Promise<void> {
   try {
     await register("Ctrl+Shift+H", async () => {
-      await invoke("toggle_window");
+      await invoke("hide_window");
     });
   } catch (e) {
     console.error("Failed to register global shortcut:", e);
@@ -1078,4 +1078,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   initUI();
   await setupGlobalShortcut();
 });
+
 
