@@ -1,0 +1,134 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小说阅读器</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="title-bar" id="title-bar" data-tauri-drag-region>
+        <div class="title-left">
+          <button id="btn-open" class="title-btn" title="打开文件">📂</button>
+          <button id="btn-toc-title" class="title-btn" title="目录">📖</button>
+          <button id="btn-history-title" class="title-btn" title="历史">📋</button>
+          <span class="title" data-tauri-drag-region>小说阅读器</span>
+        </div>
+        <div class="window-controls">
+          <button id="btn-settings" class="win-btn" title="设置">⚙</button>
+          <button id="btn-minimize" class="win-btn" title="最小化">─</button>
+          <button id="btn-close" class="win-btn" title="关闭">×</button>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="reader-area" id="reader-area">
+          <div class="reader-controls" id="reader-controls">
+            <button id="btn-exit-reading" class="control-btn" title="退出阅读模式">✕</button>
+            <button id="btn-toggle-settings" class="control-btn" title="设置">⚙</button>
+            <button id="btn-toggle-toc" class="control-btn" title="目录">📖</button>
+          </div>
+
+          <div class="toc-sidebar" id="toc-sidebar">
+            <div class="toc-tabs">
+              <button class="toc-tab active" data-tab="toc">目录</button>
+              <button class="toc-tab" data-tab="history">历史</button>
+            </div>
+            <div class="toc-content">
+              <div class="toc-list" id="toc-list">
+                <div class="toc-empty">暂无目录</div>
+              </div>
+              <div class="history-list" id="history-list" style="display: none"></div>
+            </div>
+          </div>
+
+          <div class="reader-content" id="reader-content">
+            <div class="welcome-text" id="welcome-text">
+              <p>欢迎使用小说阅读器</p>
+              <p class="hint">点击左上角📂打开文件</p>
+              <p class="hint">按 F11 或在设置中开启阅读模式</p>
+              <p class="hint">阅读模式下点击📖可打开目录</p>
+              <p class="hint">Ctrl+Shift+H 快速隐藏窗口</p>
+            </div>
+            <div class="loading-indicator" id="loading-indicator" style="display: none">
+              <div class="loading-spinner"></div>
+              <p class="loading-text" id="loading-text">加载中...</p>
+              <div class="loading-progress">
+                <div class="loading-progress-bar" id="loading-progress-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reader-footer">
+            <div class="chapter-title" id="chapter-title"></div>
+            <div class="progress-bar" id="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="page-info" id="page-info">0/0 (0%)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+          <span>阅读设置</span>
+          <button id="btn-close-settings">×</button>
+        </div>
+        <div class="settings-content">
+          <div class="setting-item">
+            <label>字体大小: <span id="font-size-value">18</span>px</label>
+            <input type="range" id="font-size" min="12" max="32" value="18" />
+          </div>
+          <div class="setting-item">
+            <label>行距: <span id="line-height-value">1.6</span></label>
+            <input type="range" id="line-height" min="10" max="25" value="16" />
+          </div>
+          <div class="setting-item">
+            <label>每页字数: <span id="chars-per-page-value">1000</span></label>
+            <input type="range" id="chars-per-page" min="500" max="2000" value="1000" step="100" />
+          </div>
+          <div class="setting-item">
+            <label>文字颜色</label>
+            <input type="color" id="text-color" value="#2c3e50" />
+          </div>
+          <div class="setting-item">
+            <label>背景透明度: <span id="opacity-value">0.85</span></label>
+            <input type="range" id="opacity" min="0" max="100" value="85" />
+          </div>
+          <div class="setting-item">
+            <label>窗口透明度: <span id="window-opacity-value">1.0</span></label>
+            <input type="range" id="window-opacity" min="0" max="100" value="100" />
+          </div>
+          <div class="setting-item">
+            <label><input type="checkbox" id="reading-mode" /> 阅读模式</label>
+          </div>
+          <div class="setting-item">
+            <label><input type="checkbox" id="mouse-mode" /> 鼠标翻页模式（左半屏上一页，右半屏下一页）</label>
+          </div>
+          <div class="setting-item">
+            <label>字体</label>
+            <select id="font-family">
+              <option value="SimSun, Songti SC, serif">宋体</option>
+              <option value="KaiTi, STKaiti, serif">楷体</option>
+              <option value="SimHei, sans-serif">黑体</option>
+              <option value="Microsoft YaHei, PingFang SC, sans-serif" selected>微软雅黑</option>
+              <option value="DengXian, sans-serif">等线</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>编码</label>
+            <select id="encoding">
+              <option value="utf-8" selected>UTF-8</option>
+              <option value="gbk">GBK</option>
+              <option value="gb2312">GB2312</option>
+              <option value="big5">Big5</option>
+              <option value="gb18030">GB18030</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
